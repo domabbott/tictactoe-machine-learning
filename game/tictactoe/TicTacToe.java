@@ -9,6 +9,7 @@ public class TicTacToe {
 	private Player player1 = null;
 	private Player player2 = null;
 	private UI ui = null;
+	private boolean gameHasEnded = false;
 	
 	public TicTacToe(Player player1, Player player2, UI ui){
 		
@@ -30,15 +31,7 @@ public class TicTacToe {
 	
 	public void makeMove(int x, int y) {
 		
-		if (getWon() != null) {
-			Logger.log(String.format("%s won the game!", spaceToString(getWon())));
-		}
-		
-		else if (isCatscratch()) {
-			Logger.log("Catscratch!");
-		}
-		
-		else {
+		if (!gameHasEnded) {
 		
 			if (gameState[x][y] == Space.EMPTY) {
 				gameState[x][y] = turn;
@@ -54,9 +47,25 @@ public class TicTacToe {
 					player1.makeMove();
 					turn = Space.X;
 				}
+				
+				ui.setTurnText(String.format("%s's turn", spaceToString(turn)));
+
 			}
-		}
 		
+			
+			if (getWon() != null) {
+				ui.setWinText(String.format("%s won the game!", spaceToString(getWon())));
+				ui.setTurnText("");
+				gameHasEnded = true;
+				
+			}
+			
+			else if (isCatscratch()) {
+				ui.setWinText("Catscratch!");
+				gameHasEnded = true;
+			}
+		
+		}
 	}
 	
 	private void updateUI() {

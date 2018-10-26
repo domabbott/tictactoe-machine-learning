@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
@@ -18,10 +19,12 @@ public class UI {
 	
 	private Button[][] spaces = new Button[3][3];
 	EventHandler<ActionEvent> clickFunc = null;
+	Label winLabel = null;
+	Label turnLabel = null;
 
 	public void startGame(Stage stage) {
 		stage.setTitle("TicTacToe");
-		int size = 500;
+		int size = 600;
 		
 		stage.setHeight(size);
 		stage.setWidth(size);
@@ -29,14 +32,28 @@ public class UI {
 		AnchorPane pane = new AnchorPane();
 		pane.setPrefHeight(size);
 		pane.setPrefWidth(size);
+		pane.getStylesheets().add(getClass().getResource("/resources/style.css").toExternalForm());
+		
+		winLabel = new Label();
+		winLabel.getStyleClass().add("label");
+		winLabel.setLayoutY(size*.8);
+		winLabel.setLayoutX(size/4);
+		pane.getChildren().add(winLabel);
+		
+		turnLabel = new Label();
+		winLabel.getStyleClass().add("label");
+		turnLabel.setLayoutY(size*.01);
+		turnLabel.setLayoutX(size/3);
+		pane.getChildren().add(turnLabel);
 		
 		for (int x = 0; x < 3; x++) {
 			for (int y = 0; y < 3; y++) {
-				int[] pos = {x*(size/3) + 40, y*(size/3) + 30};
+				int[] pos = {x*(size/5) + 140, y*(size/5) + 140};
 				Button button = new Button();
 				
 				button.setLayoutX(pos[0]);
 				button.setLayoutY(pos[1]);
+				button.setMaxSize(size/10, size/10);
 				
 				int imgSize = size/7;
 				button.setPrefSize(imgSize, imgSize);
@@ -102,6 +119,14 @@ public class UI {
 
 	public void setClickFunc(EventHandler<ActionEvent> clickFunc) {
 		this.clickFunc = clickFunc;
+	}
+	
+	public void setWinText(String text) {
+		winLabel.setText(text);
+	}
+	
+	public void setTurnText(String text) {
+		turnLabel.setText(text);
 	}
 
 
