@@ -10,6 +10,7 @@ public class TicTacToe {
 	private Player player2 = null;
 	private UI ui = null;
 	private boolean gameHasEnded = false;
+	private Integer[] lastMove = new Integer[2];
 	
 	public TicTacToe(Player player1, Player player2, UI ui){
 		
@@ -26,53 +27,62 @@ public class TicTacToe {
 		this.ui = ui;
 		
 		player1.makeMove();
-				
+
 	}
 	
 	public void makeMove(int x, int y) {
+
 		
-		if (!gameHasEnded) {
-		
+		if (!gameHasEnded) {		
 			if (gameState[x][y] == Space.EMPTY) {
-				gameState[x][y] = turn;
 				
+				lastMove[0] = x;
+				lastMove[1] = y;
+				Logger.log(String.format("%s moved to %s, %s", turn, x, y));
+
+				gameState[x][y] = turn;
+
 				updateUI();
 				
-				if (turn == Space.X) {
-					player2.makeMove();
-					turn = Space.O;
-				}
 				
-				else {
-					player1.makeMove();
-					turn = Space.X;
-				}
-				
-				ui.setTurnText(String.format("%s's turn", spaceToString(turn)));
-
-			}
-		
-			
-			if (getWon() != null) {
-				ui.setWinText(String.format("%s won the game!", spaceToString(getWon())));
-				ui.setTurnText("");
-				gameHasEnded = true;
-				
-			}
-			
-			else if (isCatscratch()) {
-				ui.setWinText("Catscratch!");
-				gameHasEnded = true;
 			}
 		
 		}
+		
+		if (getWon() != null) {
+			ui.setWinText(String.format("%s won the game", getWon()));
+			ui.setTurnText("");
+			gameHasEnded = true;
+			
+		}
+		
+		else if (isCatscratch()) {
+			ui.setWinText("Cat Scratch");
+			ui.setTurnText("");
+			gameHasEnded = true;
+		}
+		
+		else {
+			if (turn == Space.X) {
+				turn = Space.O;
+				player2.makeMove();
+			}
+			
+			else {
+				turn = Space.X;
+				player1.makeMove();
+
+			}
+			ui.setTurnText(String.format("%s's turn", (turn)));
+		}
+		
 	}
 	
 	private void updateUI() {
 		ui.updateGameState(gameState);
 	}
 	
-	private Space getWon() {
+	public Space getWon() {
 		//horizontal checks
 		for (int x = 0; x< 3; x++) {
 			if (gameState[x][0] == gameState[x][1] && gameState[x][1] == gameState[x][2] && gameState[x][0] != Space.EMPTY) {
@@ -94,11 +104,11 @@ public class TicTacToe {
 		if (gameState[1][1] != Space.EMPTY) {
 			
 			if (gameState[0][0] == gameState[1][1] && gameState[2][2] == gameState[1][1]) {
-				return gameState[0][0];
+				return gameState[1][1];
 			}
 			
 			else if (gameState[2][0] == gameState[1][1] && gameState[1][1] == gameState[0][2]) {
-				return gameState[2][0];
+				return gameState[1][1];
 			}
 			
 		}
@@ -106,7 +116,7 @@ public class TicTacToe {
 		return null;
 	}
 	
-	private boolean isCatscratch() {
+	public boolean isCatscratch() {
 		
 		for (int i = 0; i < 9; i++) {
 			if (gameState[i%3][i/3] == Space.EMPTY) {
@@ -117,23 +127,17 @@ public class TicTacToe {
 		return true;
 	}
 	
-	private String spaceToString(Space space) {
-		if (space == Space.O) {
-			return "O";
-		}
-		
-		else if (space == Space.X) {
-			return "X";
-		}
-		
-		else {
-			return "Empty";
-		}
-	}
-	
 	
 	public UI getUI() {
 		return ui;
+	}
+	
+	public Space[][] getGameState(){
+		return gameState;
+	}
+	
+	public Integer[] getLastMove() {
+		return lastMove;
 	}
 	
 }

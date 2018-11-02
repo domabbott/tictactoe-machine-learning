@@ -1,5 +1,6 @@
 package main;
 
+import game.tictactoe.AIPlayer;
 import game.tictactoe.HumanPlayer;
 import game.tictactoe.Player;
 import game.tictactoe.TicTacToe;
@@ -12,12 +13,10 @@ public class Main extends Application{
 	static UI ui = new UI();
 
 	public static void main(String[] args) {
-		Player player1 = new HumanPlayer();
-		Player player2 = new HumanPlayer();
 		
-		TicTacToe ttt = new TicTacToe(player1, player2, ui);
 		
 		launch(args);
+
 
 	}
 
@@ -26,6 +25,13 @@ public class Main extends Application{
 		
 		ui.startGame(stage);
 		
+		Player player0 = new AIPlayer();
+		Player player1 = new AIPlayer();
+		Player player2 = new HumanPlayer();
+		Player player3 = new HumanPlayer();
+		
+		TicTacToe ttt = new TicTacToe(player0, player2, ui);
 	}
+	
 
 }

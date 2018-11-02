@@ -1,5 +1,6 @@
 package game.ui;
 
+import game.tictactoe.HumanPlayer;
 import game.tictactoe.Space;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -64,10 +65,9 @@ public class UI {
 				
 				button.setBackground(background);
 				
-				button.setUserData(x + y*3);
-				button.setOnAction(clickFunc);				
-				
+				button.setUserData(x + y*3);				
 				spaces[x][y] = button;
+
 				
 				pane.getChildren().add(button);
 			}
@@ -118,7 +118,12 @@ public class UI {
 	
 
 	public void setClickFunc(EventHandler<ActionEvent> clickFunc) {
-		this.clickFunc = clickFunc;
+		for (Button[] i : spaces) {
+			for (Button j : i) {
+				j.setOnAction(clickFunc);
+			}
+		}
+
 	}
 	
 	public void setWinText(String text) {
