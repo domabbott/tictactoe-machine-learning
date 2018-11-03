@@ -10,20 +10,18 @@ import javafx.stage.Stage;
 
 public class Main extends Application{
 	
-	static UI ui = new UI();
 
 	public static void main(String[] args) {
-		
-		
+	
 		launch(args);
-
 
 	}
 
 	@Override
 	public void start(Stage stage) throws Exception {
-		
-		ui.startGame(stage);
+		UI ui = new UI(stage);
+
+		ui.startGame();
 		
 		Player player0 = new AIPlayer();
 		Player player1 = new AIPlayer();

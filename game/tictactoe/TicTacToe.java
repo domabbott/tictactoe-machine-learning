@@ -1,6 +1,8 @@
 package game.tictactoe;
 
 import game.ui.UI;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import main.Logger;
 
 public class TicTacToe {
@@ -11,6 +13,7 @@ public class TicTacToe {
 	private UI ui = null;
 	private boolean gameHasEnded = false;
 	private Integer[] lastMove = new Integer[2];
+	private EventHandler<ActionEvent> oldEvent = null;
 	
 	public TicTacToe(Player player1, Player player2, UI ui){
 		
@@ -33,7 +36,7 @@ public class TicTacToe {
 	public void makeMove(int x, int y) {
 
 		
-		if (!gameHasEnded) {		
+		if (!gameHasEnded) {
 			if (gameState[x][y] == Space.EMPTY) {
 				
 				lastMove[0] = x;
@@ -43,43 +46,48 @@ public class TicTacToe {
 				gameState[x][y] = turn;
 
 				updateUI();
-				
-				
-			}
-		
-		}
-		
-		if (getWon() != null) {
-			ui.setWinText(String.format("%s won the game", getWon()));
-			ui.setTurnText("");
-			gameHasEnded = true;
-			
-		}
-		
-		else if (isCatscratch()) {
-			ui.setWinText("Cat Scratch");
-			ui.setTurnText("");
-			gameHasEnded = true;
-		}
-		
-		else {
-			if (turn == Space.X) {
-				turn = Space.O;
-				player2.makeMove();
-			}
-			
-			else {
-				turn = Space.X;
-				player1.makeMove();
 
+				if (getWon() != null) {
+					ui.setWinText(String.format("%s won the game", getWon()));
+					ui.setTurnText("");
+					endGame();
+
+					//gameHasEnded = true;
+					
+				}
+				
+				else if (isCatscratch()) {
+					ui.setWinText("Cat Scratch");
+					ui.setTurnText("");
+					endGame();
+
+					//gameHasEnded = true;
+				}
+				
+				else {
+					
+					
+					if (turn == Space.X) {
+						turn = Space.O;
+						player2.makeMove();
+					}
+					
+					else {
+						turn = Space.X;
+						player1.makeMove();
+	
+					}
+				
+				}
+				ui.setTurnText(String.format("%s's turn", (turn)));
 			}
-			ui.setTurnText(String.format("%s's turn", (turn)));
+		
 		}
 		
 	}
 	
 	private void updateUI() {
-		ui.updateGameState(gameState);
+		ui.updateUI(gameState);
 	}
 	
 	public Space getWon() {
@@ -123,8 +131,28 @@ public class TicTacToe {
 				return false;
 			}
 		}
-		
+
 		return true;
+	}
+	
+	public void endGame() {
+		oldEvent = ui.getClickFunc();
+		ui.setClickFunc(this::resetGame);
+	}
+	
+	public void resetGame(ActionEvent e) {
+			
+			ui.setTurnText("");
+			ui.setWinText("");
+			
+			for (int i = 0; i < 3; i++) {
+				Space[] column = {Space.EMPTY, Space.EMPTY, Space.EMPTY};
+				gameState[i] = column;
+			}
+
+			ui.updateUI(gameState);
+			ui.setClickFunc(oldEvent);
+			oldEvent = null;
 	}
 	
 	
@@ -138,6 +166,14 @@ public class TicTacToe {
 	
 	public Integer[] getLastMove() {
 		return lastMove;
+	}
+	
+	public Player getPlayer1() {
+		return player1;
+	}
+	
+	public Player getPlayer2() {
+		return player2;
 	}
 	
 }

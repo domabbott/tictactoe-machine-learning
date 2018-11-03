@@ -22,8 +22,13 @@ public class UI {
 	EventHandler<ActionEvent> clickFunc = null;
 	Label winLabel = null;
 	Label turnLabel = null;
+	Stage stage = null;
+	
+	public UI(Stage stage) {
+		this.stage = stage;
+	}
 
-	public void startGame(Stage stage) {
+	public void startGame() {
 		stage.setTitle("TicTacToe");
 		int size = 600;
 		
@@ -84,15 +89,13 @@ public class UI {
 		stage.show();
 	}
 	
-	public void updateGameState(Space[][] gameState) {
+	public void updateUI(Space[][] gameState) {
 		
 		for (int x = 0; x < 3; x++) {
 			for (int y = 0; y < 3; y++) {
 				spaces[x][y].setBackground(spaceToBackground(gameState[x][y]));
 			}
 		}
-		
-		
 		
 	}
 	
@@ -126,6 +129,10 @@ public class UI {
 
 	}
 	
+	public EventHandler<ActionEvent> getClickFunc(){
+		return spaces[0][0].getOnAction();
+	}
+	
 	public void setWinText(String text) {
 		winLabel.setText(text);
 	}
@@ -133,6 +140,7 @@ public class UI {
 	public void setTurnText(String text) {
 		turnLabel.setText(text);
 	}
+	
 
 
 }

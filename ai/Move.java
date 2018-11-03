@@ -1,16 +1,11 @@
 package ai;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Move {
-	/*class contains:
-	 * -coordinates of move
-	 * -parent move class
-	 * -array of possible move classes
-	 * -reward value
-	 * 
-	 */
-	
+public class Move implements Serializable{
+
+	private static final long serialVersionUID = 8148451931590734390L;
 	private Integer[] coords = new Integer[2];
 	private Move parent = null;
 	private List<Move> children = null;

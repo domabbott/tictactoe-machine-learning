@@ -1,5 +1,11 @@
 package ai;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -7,6 +13,7 @@ import java.util.Random;
 
 import game.tictactoe.Space;
 import game.tictactoe.TicTacToe;
+import main.Logger;
 
 public class AI {
 	/*
@@ -19,15 +26,55 @@ public class AI {
 	 */
 	
 	private Move currMove = new Move();
-	
-	
 	private TicTacToe ttt = null;
+	private Boolean storeObject = false;
+	private String saveFileName = null;
 	
 	
 	public AI(TicTacToe ttt) {
 		this.ttt = ttt;
 		currMove.setChildren(getDefaultMoves());
 				
+	}
+	
+	public AI(TicTacToe ttt, String saveFileName) {
+		this.ttt = ttt;
+		this.saveFileName = "/saves/" + saveFileName;
+		
+		try {
+			startFromFile(this.saveFileName);
+		}
+		
+		catch(IOException e) {
+			Logger.log("Game save not found, creating new save file");
+		}
+		
+		catch (ClassNotFoundException f) {
+			f.printStackTrace();
+		}
+		
+		storeObject = true;
+	}
+	
+	public void startFromFile(String filename) throws IOException, ClassNotFoundException {
+		 FileInputStream file = new FileInputStream(filename); 
+         ObjectInputStream in = new ObjectInputStream(file); 
+           
+         currMove = (Move) in.readObject(); 
+           
+         in.close(); 
+         file.close(); 
+	}
+	
+	public void serializeMoveTree() throws IOException {
+        FileOutputStream file = new FileOutputStream(saveFileName); 
+        ObjectOutputStream out = new ObjectOutputStream(file); 
+          
+        out.writeObject(currMove); 
+          
+        out.close(); 
+        file.close(); 
+          
 	}
 	
 	public Integer[] getMove() {
@@ -52,6 +99,11 @@ public class AI {
 	}
 	
 	private void populateNewChildren() {
+		if (currMove == null) {
+			for (Space[] i : ttt.getGameState()) {
+				System.out.println(Arrays.toString(i));
+			}
+		}
 		if (currMove.getChildren() == null) {
 			currMove.setChildren(getDefaultMoves());
 
@@ -72,20 +124,36 @@ public class AI {
 		
 	}
 	
-	public void setRewards(boolean hasWon) {
-		float reward;
+	public void setRewards(Boolean hasWon) {
+		float increment;
 		
-		if (hasWon) {
-			reward = 100;
+		if (hasWon == null) {
+			increment = -10;
+		}
+		
+		else if (hasWon) {
+			increment = 100;
 		}
 		
 		else {
-			reward = -100;
+			increment = -100;
 		}
 		
 		while (currMove.getParent() != null) {
+			float reward = (currMove.getReward() + increment);
+			increment *= .7f;
 			currMove.setReward(reward);
-			reward += (reward * .9);
+			currMove = currMove.getParent();
+		}
+		
+		if (storeObject) {
+			try {
+				serializeMoveTree();
+			}
+			
+			catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -103,7 +171,7 @@ public class AI {
 		float rand = new Random().nextFloat() * total;
 		
 		
-		for (int i = 1; i < weights.length; i++) {
+		for (int i = 0; i < weights.length; i++) {
 			if (rand <= cumulativeWeights[i]) {
 				return  currMove.getChildren().get(i);
 			}
