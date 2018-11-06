@@ -8,11 +8,40 @@ public class AIPlayer implements Player{
 	private TicTacToe ttt = null;
 	private AI ai = null;
 	private String filename = null;
+	private String name = "AI";
 	
 	public AIPlayer(){}
 	
-	public AIPlayer(String filename) {
+	public AIPlayer(String name) {
+		this.name = name;
+	}
+	
+	public AIPlayer(String filename, String name) {
 		this.filename = filename;
+		
+		if (name != null) {
+			this.name = name;
+		}
+	}
+
+	@Override
+	public void notifyWin(Boolean hasWon) {
+		String state = null;
+		
+		if (hasWon == null) {
+			state = "tied";
+		}
+		
+		else if (hasWon) {
+			state = "won";
+		}
+		
+		else {
+			state="lost";
+		}
+		
+		Logger.log(String.format("%s has %s", name, state));
+		ai.setRewards(hasWon);
 	}
 	
 	@Override
@@ -26,46 +55,17 @@ public class AIPlayer implements Player{
 		else {
 			ai = new AI(ttt, filename);
 		}
+		
 	}
 
 	@Override
 	public void makeMove() {
-	
-		if (ttt.getWon() != getPlayer() && ttt.getWon() != null) {
-			Logger.log("Setting rewards for ai loss");
-			ai.setRewards(false);
-		}
+		Logger.log(String.format("%s is making a move", name));
 		
-		else if (ttt.isCatscratch()) {
-			Logger.log("Setting rewards for catscratch");
-			ai.setRewards(null);
-		}
+		Integer[] move = ai.getMove();
+		ttt.makeMove(move[0], move[1]);
 		
-		else {
-			Integer[] move = ai.getMove();
-			ttt.makeMove(move[0], move[1]);
-			
-		}
-		
-		
-		if (ttt.getWon() == getPlayer()) {
-			Logger.log("Setting rewards for ai win");
-			ai.setRewards(true);
-			
-		}
 		
 	}
-	
-	
-	private Space getPlayer() {
-		if (this.equals(ttt.getPlayer1())) {
-			return Space.X;
-		}
-		
-		else {
-			return Space.O;
-		}
-	}
-
 
 }

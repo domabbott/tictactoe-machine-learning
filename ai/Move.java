@@ -9,7 +9,7 @@ public class Move implements Serializable{
 	private Integer[] coords = new Integer[2];
 	private Move parent = null;
 	private List<Move> children = null;
-	private float reward = 1;
+	private float reward = 500;
 	
 	public Integer[] getCoords() {
 		return coords;

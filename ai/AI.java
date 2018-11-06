@@ -16,14 +16,6 @@ import game.tictactoe.TicTacToe;
 import main.Logger;
 
 public class AI {
-	/*
-	 * Steps:
-	 * 	-Make a move according to a tree, random if nessesary
-	 *  -Store in an array
-	 * 	-At the end, depending on whether result is win or lose, assign point values to posotions seen along the way
-	 * 	-Store the result in a tree
-	 * 
-	 */
 	
 	private Move currMove = new Move();
 	private TicTacToe ttt = null;
@@ -39,24 +31,27 @@ public class AI {
 	
 	public AI(TicTacToe ttt, String saveFileName) {
 		this.ttt = ttt;
-		this.saveFileName = "/saves/" + saveFileName;
+		this.saveFileName = "src/saves/" + saveFileName;
 		
 		try {
 			startFromFile(this.saveFileName);
+			storeObject = true;
 		}
 		
 		catch(IOException e) {
-			Logger.log("Game save not found, creating new save file");
+			Logger.log("Game save not found, will create new save file");
+			currMove.setChildren(getDefaultMoves());
+			storeObject = true;
 		}
 		
 		catch (ClassNotFoundException f) {
 			f.printStackTrace();
 		}
 		
-		storeObject = true;
 	}
 	
 	public void startFromFile(String filename) throws IOException, ClassNotFoundException {
+		Logger.log("Loading game from " + filename);
 		 FileInputStream file = new FileInputStream(filename); 
          ObjectInputStream in = new ObjectInputStream(file); 
            
@@ -67,6 +62,7 @@ public class AI {
 	}
 	
 	public void serializeMoveTree() throws IOException {
+		Logger.log("Saving game to " + saveFileName);
         FileOutputStream file = new FileOutputStream(saveFileName); 
         ObjectOutputStream out = new ObjectOutputStream(file); 
           
@@ -78,8 +74,7 @@ public class AI {
 	}
 	
 	public Integer[] getMove() {
-		
-	
+				
 		if (ttt.getLastMove()[0] != null) {
 			for (int i = 0; i < currMove.getChildren().size(); i++)	{
 				Integer[] childCoords = currMove.getChildren().get(i).getCoords();
@@ -99,11 +94,7 @@ public class AI {
 	}
 	
 	private void populateNewChildren() {
-		if (currMove == null) {
-			for (Space[] i : ttt.getGameState()) {
-				System.out.println(Arrays.toString(i));
-			}
-		}
+		
 		if (currMove.getChildren() == null) {
 			currMove.setChildren(getDefaultMoves());
 
@@ -140,12 +131,21 @@ public class AI {
 		}
 		
 		while (currMove.getParent() != null) {
+			
 			float reward = (currMove.getReward() + increment);
 			increment *= .7f;
+			
+			//minimum value for a move
+			if (reward < 20) {
+				reward = 20;
+			}
+			
 			currMove.setReward(reward);
 			currMove = currMove.getParent();
+			
+			logAction();
 		}
-		
+			
 		if (storeObject) {
 			try {
 				serializeMoveTree();
@@ -155,6 +155,22 @@ public class AI {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	private void logAction() {
+		List<Integer[]> moves = new ArrayList<Integer[]>();
+		List<Float> weights = new ArrayList<Float>();
+		for (Move i : currMove.getChildren()) {
+			moves.add(i.getCoords());
+			weights.add(i.getReward());
+		}
+		StringBuilder builder = new StringBuilder();
+		
+		for (int i = 0; i < moves.size(); i++) {
+			builder.append(String.format("Move: %s, Weight: %s \n", Arrays.toString((moves.get(i))), weights.get(i)));
+		}
+		
+		Logger.log(builder.toString());
 	}
 	
 	private Move selectWeighted() {

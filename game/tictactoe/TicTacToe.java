@@ -11,7 +11,6 @@ public class TicTacToe {
 	private Player player1 = null;
 	private Player player2 = null;
 	private UI ui = null;
-	private boolean gameHasEnded = false;
 	private Integer[] lastMove = new Integer[2];
 	private EventHandler<ActionEvent> oldEvent = null;
 	
@@ -36,7 +35,6 @@ public class TicTacToe {
 	public void makeMove(int x, int y) {
 
 		
-		if (!gameHasEnded) {
 			if (gameState[x][y] == Space.EMPTY) {
 				
 				lastMove[0] = x;
@@ -51,8 +49,16 @@ public class TicTacToe {
 					ui.setWinText(String.format("%s won the game", getWon()));
 					ui.setTurnText("");
 					endGame();
-
-					//gameHasEnded = true;
+					
+					if (getWon() == Space.X) {
+						player1.notifyWin(true);
+						player2.notifyWin(false);
+					}
+					
+					else {
+						player1.notifyWin(false);
+						player2.notifyWin(true);
+					}
 					
 				}
 				
@@ -60,8 +66,9 @@ public class TicTacToe {
 					ui.setWinText("Cat Scratch");
 					ui.setTurnText("");
 					endGame();
+					player1.notifyWin(null);
+					player2.notifyWin(null);
 
-					//gameHasEnded = true;
 				}
 				
 				else {
@@ -79,8 +86,8 @@ public class TicTacToe {
 					}
 				
 				}
+				
 				ui.setTurnText(String.format("%s's turn", (turn)));
-			}
 		
 		}
 		
@@ -153,6 +160,10 @@ public class TicTacToe {
 			ui.updateUI(gameState);
 			ui.setClickFunc(oldEvent);
 			oldEvent = null;
+			
+			turn = Space.X;
+			player1.makeMove();
+			
 	}
 	
 	
