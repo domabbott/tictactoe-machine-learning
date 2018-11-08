@@ -43,7 +43,7 @@ public class HumanPlayer implements Player{
 	}
 
 	@Override
-	public void notifyWin(Boolean hasWon) {
+	public void notifyGameEnd(Boolean hasWon) {
 		String state = null;
 		
 		if (hasWon) {

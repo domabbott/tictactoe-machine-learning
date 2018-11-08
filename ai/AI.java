@@ -1,7 +1,7 @@
 package ai;
 
+import java.awt.IllegalComponentStateException;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -17,15 +17,16 @@ import main.Logger;
 
 public class AI {
 	
-	private Move currMove = new Move();
+	public Move currMove = new Move();
 	private TicTacToe ttt = null;
 	private Boolean storeObject = false;
 	private String saveFileName = null;
+	private int lastAmount = 0;
 	
 	
 	public AI(TicTacToe ttt) {
 		this.ttt = ttt;
-		currMove.setChildren(getDefaultMoves());
+		populateNewChildren();
 				
 	}
 	
@@ -36,12 +37,13 @@ public class AI {
 		try {
 			startFromFile(this.saveFileName);
 			storeObject = true;
+			populateNewChildren();
 		}
 		
 		catch(IOException e) {
 			Logger.log("Game save not found, will create new save file");
-			currMove.setChildren(getDefaultMoves());
 			storeObject = true;
+			populateNewChildren();
 		}
 		
 		catch (ClassNotFoundException f) {
@@ -51,7 +53,7 @@ public class AI {
 	}
 	
 	public void startFromFile(String filename) throws IOException, ClassNotFoundException {
-		Logger.log("Loading game from " + filename);
+		 Logger.log("Loading game from " + filename);
 		 FileInputStream file = new FileInputStream(filename); 
          ObjectInputStream in = new ObjectInputStream(file); 
            
@@ -74,16 +76,25 @@ public class AI {
 	}
 	
 	public Integer[] getMove() {
+		logAction();
 				
 		if (ttt.getLastMove()[0] != null) {
+			
+			boolean hasMoved = false;
+			
 			for (int i = 0; i < currMove.getChildren().size(); i++)	{
 				Integer[] childCoords = currMove.getChildren().get(i).getCoords();
 				Integer[] lastMoveCoords = ttt.getLastMove();
-				if (childCoords[0] == lastMoveCoords[0] && childCoords[1] == lastMoveCoords[1]) {
+				if (childCoords[0].equals(lastMoveCoords[0]) && childCoords[1].equals(lastMoveCoords[1])) {
 					currMove = currMove.getChildren().get(i);
 					populateNewChildren();
+					hasMoved = true;
 					break;
 				}
+			}
+			
+			if (!hasMoved) {
+				throw new IllegalStateException("Opponent's move wasn't detected");
 			}
 	
 		}
@@ -130,10 +141,11 @@ public class AI {
 			increment = -100;
 		}
 		
+		Logger.log("Setting rewards");
 		while (currMove.getParent() != null) {
 			
 			float reward = (currMove.getReward() + increment);
-			increment *= .7f;
+			increment *= -.7f;
 			
 			//minimum value for a move
 			if (reward < 20) {
@@ -141,9 +153,8 @@ public class AI {
 			}
 			
 			currMove.setReward(reward);
-			currMove = currMove.getParent();
-			
-			logAction();
+
+			currMove = currMove.getParent();			
 		}
 			
 		if (storeObject) {
@@ -155,6 +166,7 @@ public class AI {
 				e.printStackTrace();
 			}
 		}
+		
 	}
 	
 	private void logAction() {
@@ -207,7 +219,7 @@ public class AI {
 				moves.add(move);
 			}
 		}
-		
+	
 		return moves;
 	}
 	

@@ -1,5 +1,7 @@
 package game.tictactoe;
 
+import java.util.Arrays;
+
 import ai.AI;
 import main.Logger;
 
@@ -16,7 +18,7 @@ public class AIPlayer implements Player{
 		this.name = name;
 	}
 	
-	public AIPlayer(String filename, String name) {
+	public AIPlayer(String name, String filename) {
 		this.filename = filename;
 		
 		if (name != null) {
@@ -25,7 +27,7 @@ public class AIPlayer implements Player{
 	}
 
 	@Override
-	public void notifyWin(Boolean hasWon) {
+	public void notifyGameEnd(Boolean hasWon) {
 		String state = null;
 		
 		if (hasWon == null) {
@@ -42,6 +44,8 @@ public class AIPlayer implements Player{
 		
 		Logger.log(String.format("%s has %s", name, state));
 		ai.setRewards(hasWon);
+		
+		ttt.isReady(this);
 	}
 	
 	@Override
@@ -64,8 +68,6 @@ public class AIPlayer implements Player{
 		
 		Integer[] move = ai.getMove();
 		ttt.makeMove(move[0], move[1]);
-		
-		
 	}
 
 }

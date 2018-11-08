@@ -10,6 +10,7 @@ public class TicTacToe {
 	private Space turn = Space.X;
 	private Player player1 = null;
 	private Player player2 = null;
+	private boolean[] playersAreReady = {false, false};
 	private UI ui = null;
 	private Integer[] lastMove = new Integer[2];
 	private EventHandler<ActionEvent> oldEvent = null;
@@ -33,7 +34,6 @@ public class TicTacToe {
 	}
 	
 	public void makeMove(int x, int y) {
-
 		
 			if (gameState[x][y] == Space.EMPTY) {
 				
@@ -51,13 +51,13 @@ public class TicTacToe {
 					endGame();
 					
 					if (getWon() == Space.X) {
-						player1.notifyWin(true);
-						player2.notifyWin(false);
+						player1.notifyGameEnd(true);
+						player2.notifyGameEnd(false);
 					}
 					
 					else {
-						player1.notifyWin(false);
-						player2.notifyWin(true);
+						player1.notifyGameEnd(false);
+						player2.notifyGameEnd(true);
 					}
 					
 				}
@@ -66,8 +66,8 @@ public class TicTacToe {
 					ui.setWinText("Cat Scratch");
 					ui.setTurnText("");
 					endGame();
-					player1.notifyWin(null);
-					player2.notifyWin(null);
+					player1.notifyGameEnd(null);
+					player2.notifyGameEnd(null);
 
 				}
 				
@@ -147,8 +147,10 @@ public class TicTacToe {
 		ui.setClickFunc(this::resetGame);
 	}
 	
-	public void resetGame(ActionEvent e) {
+	private void resetGame(ActionEvent e) {
 			
+			Logger.log("Resetting game");
+		
 			ui.setTurnText("");
 			ui.setWinText("");
 			
@@ -185,6 +187,25 @@ public class TicTacToe {
 	
 	public Player getPlayer2() {
 		return player2;
+	}
+	
+	public void isReady(Player player) {
+		if (player == player1) {
+			Logger.log("player 1 is ready");
+			playersAreReady[0] = true;
+		}
+		
+		else {
+			Logger.log("Player 2 is ready");
+			playersAreReady[1] = true;
+		}
+		
+		if (playersAreReady[0] && playersAreReady[1]) {
+			playersAreReady[0] = false;
+			playersAreReady[1] = false;
+			resetGame(null);
+
+		}
 	}
 	
 }

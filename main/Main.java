@@ -23,12 +23,11 @@ public class Main extends Application{
 
 		ui.startGame();
 		
-		Player player0 = new AIPlayer("AI Bob");
+		Player player0 = new AIPlayer("AI Serializer");//, "gameSave.save");
 		Player player1 = new AIPlayer("AI Bill");
-		Player player2 = new HumanPlayer("Dominic");
-		Player player3 = new HumanPlayer();
 				
 		TicTacToe ttt = new TicTacToe(player0, player1, ui);
+		
 	}
 	
 
